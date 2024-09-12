@@ -1,33 +1,40 @@
-let currentSlide = 1
+const slides = document.querySelectorAll(".slide")
+const prevButton = document.getElementById("controls-prev")
+const nextButton = document.getElementById("controls-next")
+const progress = document.getElementById("controls-progress")
 
 // Set initial slide
 if (!window.location.hash) window.location.hash = '#slide1'
-else currentSlide = parseInt(window.location.hash.replace(/^#slide/, ""))
+let currentSlide = parseInt(window.location.hash.replace(/^#slide/, ""))
+changeSlide(currentSlide)
 
-const slides = document.querySelectorAll(".slide")
-const prev = document.getElementById("controls-prev")
-const next = document.getElementById("controls-next")
-const progress = document.getElementById("controls-progress")
-
-// Navigation
-window.addEventListener('hashchange', function () {
-  currentSlide = parseInt(window.location.hash.replace(/^#slide/, ""))
-  updateControls()
+// Navigation with buttons
+prevButton.addEventListener("click", function (event) {
+  event.preventDefault()
+  changeSlide("prev")
 })
 
-function updateControls() {
-  prev.href = `#slide${currentSlide > 1 ? currentSlide - 1 : currentSlide}`
-  next.href = `#slide${currentSlide < slides.length ? currentSlide + 1 : currentSlide}`
-  progress.innerText = `${currentSlide} / ${slides.length}`
-}
-updateControls()
+nextButton.addEventListener("click", function (event) {
+  event.preventDefault()
+  changeSlide("next")
+})
 
 // Navigation with arrow keys
 document.addEventListener('keydown', function (event) {
+  event.preventDefault()
   const key = event.key;
-  if (key === "ArrowLeft") window.location.hash = `#slide${currentSlide > 1 ? currentSlide - 1 : currentSlide}`
-  if (key === "ArrowRight") window.location.hash = `#slide${currentSlide < slides.length ? currentSlide + 1 : currentSlide}`
+  if (key === "ArrowLeft") changeSlide("prev")
+  if (key === "ArrowRight") changeSlide("next")
 })
+
+function changeSlide(direction) {
+  if (direction === "next" && currentSlide < slides.length) currentSlide++
+  if (direction === "prev" && currentSlide > 1) currentSlide--
+
+  slides[currentSlide - 1].scrollIntoView({ behavior: "smooth" })
+  history.replaceState({}, '', `#slide${currentSlide}`);
+  progress.innerText = `${currentSlide} / ${slides.length}`
+}
 
 // Show controls while mouse moves
 const controls = document.getElementById("controls")
